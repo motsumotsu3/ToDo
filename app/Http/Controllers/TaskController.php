@@ -16,20 +16,18 @@ class TaskController extends Controller
     /**
      * フォルダーと紐付いているタスクの一覧
      *
-     * @param int $id
+     * @param Folder $folder
      * @return \Illuminate\View\View
      */
-    public function index(int $id): \Illuminate\View\View
+    public function index(Folder $folder): \Illuminate\View\View
     {
         $folders = Auth::user()->folders()->get();
 
-        $current_folder = Folder::find($id);
-
-        $tasks = $current_folder->tasks()->get();
+        $tasks = $folder->tasks()->get();
 
         return view('tasks/index',[
             'folders' => $folders,
-            'current_folder_id' => $id,
+            'current_folder_id' => $folder->id,
             'tasks' => $tasks,
         ]);
     }
@@ -37,25 +35,23 @@ class TaskController extends Controller
     /**
      * 新規タスク作成画面表示
      *
-     * @param integer $id
+     * @param Folder $folder
      * @return \Illuminate\View\View
      */
-    public function showCreateForm(int $id): \Illuminate\View\View
+    public function showCreateForm(Folder $folder): \Illuminate\View\View
     {
-        return view('tasks/create', ['folder_id' => $id]);
+        return view('tasks/create', ['folder_id' => $folder->id]);
     }
 
     /**
      * タスク新規登録
      *
-     * @param integer $id
+     * @param Folder $folder
      * @param CreateTask $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function create(CreateTask $request, int $id): \Illuminate\Http\RedirectResponse
+    public function create(Folder $folder, CreateTask $request): \Illuminate\Http\RedirectResponse
     {
-        $current_folder = Folder::find($id);
-
         $task = new Task();
         $task->title = $request->title;
         $task->due_date = $request->due_date;
@@ -63,21 +59,21 @@ class TaskController extends Controller
         $current_folder->tasks()->save($task);
 
         return redirect()->route('tasks.index', [
-            'id' => $current_folder->id,
+            'id' => $folder->id,
         ]);
     }
 
     /**
      * タスク編集画面表示
      *
-     * @param integer $id
-     * @param integer $task_id
+     * @param Folder $folder
+     * @param Task $rask
      * @return \Illuminate\View\View
      */
-    public function showEditForm(int $id, int $task_id): \Illuminate\View\View
+    public function showEditForm(Folder $folder, Task $rask): \Illuminate\View\View
     {
-        $task = Task::find($task_id);
-
+        $this->checkRelation($folder, $task);
+        
         return view('tasks/edit', [
             'task' => $task,
         ]);
@@ -86,16 +82,16 @@ class TaskController extends Controller
     /**
      * タスク編集
      *
-     * @param integer $id
-     * @param integer $task_id
+     * @param Folder $folder
+     * @param Task $task
      * @param EditTask $request
      * @return \Illuminate\Http\redirectResponse
      */
-    public function edit(int $id, int $task_id, EditTask $request): \Illuminate\Http\redirectResponse
+    public function edit(Folder $folder, Task $task, EditTask $request): \Illuminate\Http\redirectResponse
     {
-        // 1
-        $task = Task::find($task_id);
 
+        $this->checkRelation($folder, $task);
+        
         // 2
         $task->title = $request->title;
         $task->status = $request->status;
@@ -106,6 +102,13 @@ class TaskController extends Controller
         return redirect()->route('tasks.index', [
             'id' => $task->folder_id,
         ]);
+    }
+
+    private function checkRelation(Folder $folder, Task $task)
+    {
+        if ($folder->id !== $task->folder_id) {
+            abort(404);
+        }
     }
 
 }
