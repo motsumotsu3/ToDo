@@ -9,6 +9,8 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use App\Mail\ResetPassword;
+use Illuminate\Support\Facades\Mail;
 
 class User extends Authenticatable
 {
@@ -48,5 +50,10 @@ class User extends Authenticatable
     public function folders(): HasMany
     {
         return $this->hasMany('App\Models\Folder');
+    }
+
+    public function sendPasswordResetNotification($token)
+    {
+        Mail::to($this)->send(new ResetPassword($token));
     }
 }
