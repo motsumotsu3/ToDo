@@ -67,10 +67,10 @@ class TaskController extends Controller
      * タスク編集画面表示
      *
      * @param Folder $folder
-     * @param Task $rask
+     * @param Task $task
      * @return \Illuminate\View\View
      */
-    public function showEditForm(Folder $folder, Task $rask): \Illuminate\View\View
+    public function showEditForm(Folder $folder, Task $task): \Illuminate\View\View
     {
         $this->checkRelation($folder, $task);
         
