@@ -10,18 +10,17 @@ on:
       - main
     
 jobs:
-  test:
-    name: deploy to server
+  web-deploy:
+    name: 🎉 Deploy
     runs-on: ubuntu-latest
-
     steps:
-      - name: Deploy
-        uses: appleboy/ssh-action@master
-        with:
-          host: ${{ secrets.SERVER_HOST }}
-          username: ${{ secrets.SERVER_USERNAME }}
-          password: ${{ secrets.SERVER_PASS }}
-          port: ${{ secrets.SSH_PORT }}
-          script: |
-            cd ${{ secrets.SERVER_DEPLOY_DIR }}
-            git pull origin main
+    - name: 🚚 Get latest code
+      uses: actions/checkout@v3
+
+    - name: 📂 Sync files
+      uses: SamKirkland/FTP-Deploy-Action@v4.3.4
+      with:
+        server: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USERNAME }}
+        password: ${{ secrets.SERVER_PASS }}
+        server-dir: ${{ secrets.SERVER_DEPLOY_DIR }}
