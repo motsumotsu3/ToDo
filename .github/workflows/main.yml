@@ -23,4 +23,5 @@ jobs:
         server: ${{ secrets.SERVER_HOST }}
         username: ${{ secrets.SERVER_USERNAME }}
         password: ${{ secrets.SERVER_PASS }}
+        local-dir: ./laravel-ToDo-app/
         server-dir: ${{ secrets.SERVER_DEPLOY_DIR }}
