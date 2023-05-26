@@ -17,7 +17,7 @@ class FolderController extends Controller
      */
     public function showCreateForm(): \Illuminate\View\View
     {
-        return view('folders/create');
+        return view('folders.create');
     }
 
     /**
